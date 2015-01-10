@@ -12,8 +12,15 @@ import java.io.InputStreamReader;
 /**
  *
  * @author issa
+ * @edited Angelu Kaye Tiu
  */
 public class ExecuteCLT {
+    
+    private final String abeLocation;
+
+    public ExecuteCLT() {
+        this.abeLocation = System.getProperty("user.dir")+"/cpabe-0.11/";
+    }
     
     // Executes bash commands in java
     // Used for executing CP-ABE Command Line Tool by Bethencourt.
@@ -25,7 +32,7 @@ public class ExecuteCLT {
         
         try {
         //Initiates process
-        p = Runtime.getRuntime().exec(command);
+        p = Runtime.getRuntime().exec(abeLocation +command);
             
         BufferedReader reader = 
                         new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -54,7 +61,7 @@ public class ExecuteCLT {
     
     public String keygenCommand(String private_key, String[] attributes){
         StringBuffer output = new StringBuffer();
-        String[] command = {"cpabe-keygen", "-o", private_key, "pub_key", "master_key"};
+        String[] command = { abeLocation + "cpabe-keygen", "-o", private_key, "pub_key", "master_key"};
         String[] commandInput = new String[command.length + attributes.length];
         System.arraycopy(command, 0, commandInput, 0, command.length);
         System.arraycopy(attributes, 0, commandInput, command.length, attributes.length);
@@ -94,7 +101,7 @@ public class ExecuteCLT {
     
     public String encryptCommand(String file, String policy){
         StringBuffer output = new StringBuffer();
-        ProcessBuilder pb = new ProcessBuilder("cpabe-enc", "pub_key", file, policy);
+        ProcessBuilder pb = new ProcessBuilder( abeLocation + "cpabe-enc", "pub_key", file, policy);
                 
         try{
         Process p = pb.start(); 
@@ -125,7 +132,7 @@ public class ExecuteCLT {
     
     public String decryptCommand(String priv_key, String enc_file){
         StringBuffer output = new StringBuffer();
-        ProcessBuilder pb = new ProcessBuilder("cpabe-dec", "pub_key", priv_key, enc_file);
+        ProcessBuilder pb = new ProcessBuilder(abeLocation + "cpabe-dec", enc_file+"pubkey", priv_key, enc_file);
                 
         try{
         Process p = pb.start(); 
