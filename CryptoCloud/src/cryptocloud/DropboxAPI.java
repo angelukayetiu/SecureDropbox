@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
  */
 public class DropboxAPI extends javax.swing.JFrame {
     
+    AttributeManager attributeManager = null;
     String filename = null;
     File file = null;
     private final String APP_KEY = "2gljsdvv0whija4";
@@ -38,6 +39,10 @@ public class DropboxAPI extends javax.swing.JFrame {
     public DropboxAPI() {
         initComponents();
         accessToken = null;
+        attributeManager = new AttributeManager();
+        attributeManager.setVisible(false);
+        
+        
         System.out.println(System.getProperty("user.dir"));
     }
 
@@ -54,6 +59,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         File = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
+        Attributes = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -91,6 +97,14 @@ public class DropboxAPI extends javax.swing.JFrame {
             }
         });
         File.add(Open);
+
+        Attributes.setText("Manage Attributes");
+        Attributes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AttributesActionPerformed(evt);
+            }
+        });
+        File.add(Attributes);
 
         jMenuBar1.add(File);
 
@@ -145,6 +159,7 @@ public class DropboxAPI extends javax.swing.JFrame {
             System.out.println("Generating private key..." + "\n");
             System.out.println(com.keygenCommand("new_priv_key", attributes));
             System.out.println("Encrypting" + filename + "...");
+            policy = JOptionPane.showInputDialog(this, "Input policy of the file:", "Policy Information", JOptionPane.PLAIN_MESSAGE);
             System.out.println(com.encryptCommand(filename, policy));
             System.out.println("File encryption complete. \n"
                     + "Preparing to upload file to Dropbox...");
@@ -249,6 +264,10 @@ public class DropboxAPI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_downloadButtonActionPerformed
 
+    private void AttributesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttributesActionPerformed
+        attributeManager.setVisible(true);
+    }//GEN-LAST:event_AttributesActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -292,6 +311,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu Attributes;
     private javax.swing.JButton Encrypt;
     private javax.swing.JMenu File;
     private javax.swing.JMenuItem Open;
