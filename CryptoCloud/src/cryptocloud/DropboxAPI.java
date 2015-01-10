@@ -345,8 +345,9 @@ public class DropboxAPI extends javax.swing.JFrame {
         ExecuteCLT com = new ExecuteCLT();
         System.out.println("Decrypting" + filename + "...");
         System.out.println(com.decryptCommand(privkeyLocation,filename));
+        fileComposition.change(filename);
         System.out.println("File decryption complete. \n"
-            + "You can now view the file in "+filename);
+            + "You can now view the file in "+ fileComposition.toString());
     }
 
     private void upload_file(String uploadFrom, String uploadTo) throws FileNotFoundException, DbxException, InterruptedException, IOException {
@@ -373,16 +374,18 @@ public class DropboxAPI extends javax.swing.JFrame {
         String filename; // filename
         String extension; // .extension
         public FileComposition(String file){
-            path = file.substring(0, file.lastIndexOf("/")+1);
-            filename = file.substring(file.lastIndexOf("/")+1, file.lastIndexOf("."));
-            extension = file.substring(file.lastIndexOf("."));
-            
+            change(file);
             System.out.println("path "+path);
             System.out.println("filename "+filename);
             System.out.println("extension "+extension);
         }
         public String toString(){
             return path+filename+extension;
+        }
+        public void change(String file){
+            path = file.substring(0, file.lastIndexOf("/")+1);
+            filename = file.substring(file.lastIndexOf("/")+1, file.lastIndexOf("."));
+            extension = file.substring(file.lastIndexOf("."));            
         }
         public String toHiddenString(){
             return path+"."+filename+extension;
