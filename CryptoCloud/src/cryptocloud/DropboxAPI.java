@@ -315,10 +315,10 @@ public class DropboxAPI extends javax.swing.JFrame {
     private javax.swing.JTextArea textArea;
     // End of variables declaration//GEN-END:variables
 
-    private void decryptFile(String filename) {
+    private void decryptFile(String filename, String privkeyLocation) {
         ExecuteCLT com = new ExecuteCLT();
         System.out.println("Decrypting" + filename + "...");
-        System.out.println(com.decryptCommand("priv-key",filename));
+        System.out.println(com.decryptCommand(privkeyLocation,filename));
         System.out.println("File decryption complete. \n"
             + "You can now view the file in "+filename);
     }

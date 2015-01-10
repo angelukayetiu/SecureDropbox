@@ -3,7 +3,7 @@
 CryptoCloud/master_key
 CryptoCloud/pub_key
 CryptoCloud/new_priv_key
-a.txt
+*a.txt
 CryptoCloud/nbproject/*
 *.cpabe
 /CryptoCloud/dist/
