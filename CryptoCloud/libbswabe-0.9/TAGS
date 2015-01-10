@@ -1,0 +1,73 @@
+
+core.c,843
+#define NDEBUG4,61
+#define TYPE_A_PARAMS 15,207
+char last_error[last_error28,652
+bswabe_error(31,681
+raise_error(37,726
+element_from_string(54,967
+bswabe_setup(66,1170
+bswabe_prv_t* bswabe_keygen(98,2145
+base_node(158,3311
+parse_policy_postfix(177,3673
+rand_poly(259,5338
+eval_poly(280,5764
+fill_policy(306,6163
+bswabe_enc(342,6883
+check_sat(372,7436
+pick_sat_naive(404,8046
+bswabe_policy_t* cur_comp_pol;427,8552
+cmp_int(429,8587
+pick_sat_min_leaves(442,8880
+lagrange_coef(481,9823
+dec_leaf_naive(505,10233
+dec_internal_naive(525,10769
+dec_node_naive(550,11324
+dec_naive(560,11554
+dec_leaf_merge(566,11680
+dec_internal_merge(596,12377
+dec_node_merge(618,12900
+dec_merge(628,13136
+dec_leaf_flatten(663,14114
+dec_internal_flatten(691,14855
+dec_node_flatten(714,15410
+dec_flatten(725,15680
+bswabe_dec(740,15924
+
+misc.c,604
+serialize_uint32(11,143
+unserialize_uint32(24,330
+serialize_element(37,496
+unserialize_element(52,765
+serialize_string(68,1048
+unserialize_string(74,1162
+bswabe_pub_serialize(97,1451
+bswabe_pub_unserialize(112,1743
+bswabe_msk_serialize(140,2452
+bswabe_msk_unserialize(152,2638
+bswabe_prv_serialize(173,3050
+bswabe_prv_unserialize(194,3521
+serialize_policy(232,4238
+unserialize_policy(251,4650
+bswabe_cph_serialize(280,5287
+bswabe_cph_unserialize(293,5496
+bswabe_pub_free(314,5932
+bswabe_msk_free(326,6148
+bswabe_prv_free(334,6264
+bswabe_policy_free(356,6576
+bswabe_cph_free(376,6867
+
+bswabe.h,196
+typedef struct bswabe_pub_s bswabe_pub_t;13,186
+typedef struct bswabe_msk_s bswabe_msk_t;18,258
+typedef struct bswabe_prv_s bswabe_prv_t;23,324
+typedef struct bswabe_cph_s bswabe_cph_t;31,616
+
+private.h,186
+struct bswabe_pub_s5,72
+struct bswabe_msk_s15,269
+bswabe_prv_comp_t;33,584
+struct bswabe_prv_s35,604
+bswabe_polynomial_t;47,823
+bswabe_policy_t;67,1336
+struct bswabe_cph_s69,1354
