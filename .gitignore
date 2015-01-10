@@ -8,3 +8,4 @@ CryptoCloud/nbproject/*
 *.cpabe
 /CryptoCloud/dist/
 CryptoCloud/build
+.DS_store
