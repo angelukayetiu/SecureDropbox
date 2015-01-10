@@ -38,6 +38,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     public DropboxAPI() {
         initComponents();
         accessToken = null;
+        System.out.println(System.getProperty("user.dir"));
     }
 
     @SuppressWarnings("unchecked")
