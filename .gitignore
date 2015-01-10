@@ -6,3 +6,5 @@ CryptoCloud/new_priv_key
 a.txt
 CryptoCloud/nbproject/*
 *.cpabe
+/CryptoCloud/dist/
+CryptoCloud/build

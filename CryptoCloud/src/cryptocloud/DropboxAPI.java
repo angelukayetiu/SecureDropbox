@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,8 @@ public class DropboxAPI extends javax.swing.JFrame {
     
     String filename = null;
     File file = null;
+    private final String APP_KEY = "2gljsdvv0whija4";
+    private final String APP_SECRET = "kuw1l5rhux1q2pp";
     
     public DropboxAPI() {
         initComponents();
@@ -50,6 +53,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         Encrypt = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
+        downloadButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         File = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
@@ -74,6 +78,13 @@ public class DropboxAPI extends javax.swing.JFrame {
         textArea.setRows(5);
         jScrollPane1.setViewportView(textArea);
 
+        downloadButton.setText("Download");
+        downloadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downloadButtonActionPerformed(evt);
+            }
+        });
+
         File.setText("File");
 
         Open.setText("Open");
@@ -94,9 +105,11 @@ public class DropboxAPI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(22, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(downloadButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Encrypt)
                         .addGap(38, 38, 38)
                         .addComponent(Upload)))
@@ -110,7 +123,8 @@ public class DropboxAPI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Upload)
-                    .addComponent(Encrypt))
+                    .addComponent(Encrypt)
+                    .addComponent(downloadButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(40, 40, 40))
         );
 
@@ -124,8 +138,6 @@ public class DropboxAPI extends javax.swing.JFrame {
     private void EncryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EncryptActionPerformed
         String policy = "student and comsci";
         String[] attributes = {"comsci_student", "Cavite"};
-        final String APP_KEY = "vr9ab1d9xftq0no";
-        final String APP_SECRET = "rzecxkjqqwev0wn";
         
         try {
             textArea.append("Preparing to encrypt file.");
@@ -145,7 +157,7 @@ public class DropboxAPI extends javax.swing.JFrame {
                 "JavaTutorial/1.0", Locale.getDefault().toString());
             DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
                         
-            String authorizeUrl = webAuth.start();
+/*            String authorizeUrl = webAuth.start();
             System.out.println("1. Go to: " + authorizeUrl);
             System.out.println("2. Click \"Allow\" (you might have to log in first)");
             System.out.println("3. Copy the authorization code.");
@@ -153,8 +165,8 @@ public class DropboxAPI extends javax.swing.JFrame {
             
             System.out.println("Code is" + code);
             DbxAuthFinish authFinish = webAuth.finish(code);
-            String accessToken = authFinish.accessToken;
-            
+            //String accessToken = authFinish.accessToken;
+*/            String accessToken = "IS3HsK4J0YUAAAAAAAAM2q2eqeU2e4toyPAy6-U6YD08fhlaT9GWxQ8Y8jTIzzC3";
             DbxClient client = new DbxClient(config, accessToken);
             System.out.println("Linked account: " + client.getAccountInfo().displayName);
             
@@ -191,6 +203,63 @@ public class DropboxAPI extends javax.swing.JFrame {
             System.out.println("File access cancelled by user.");
         }
     }//GEN-LAST:event_OpenActionPerformed
+    
+    private DbxClient authenticate() throws DbxException, InterruptedException{
+        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+        DbxRequestConfig config = new DbxRequestConfig(
+                "JavaTutorial/1.0", Locale.getDefault().toString());
+        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
+
+/*            String authorizeUrl = webAuth.start();
+            System.out.println("1. Go to: " + authorizeUrl);
+            System.out.println("2. Click \"Allow\" (you might have to log in first)");
+            System.out.println("3. Copy the authorization code.");
+            String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
+            
+            System.out.println("Code is" + code);
+            DbxAuthFinish authFinish = webAuth.finish(code);
+            //String accessToken = authFinish.accessToken;
+*/          
+        String accessToken = "IS3HsK4J0YUAAAAAAAAM2q2eqeU2e4toyPAy6-U6YD08fhlaT9GWxQ8Y8jTIzzC3";
+        DbxClient client = new DbxClient(config, accessToken);
+        System.out.println("Linked account: " + client.getAccountInfo().displayName); 
+        return client;
+    }
+    
+    /* open filechoose where to save the file*/
+    private String downloadFileLocation(){
+        String downloadedFilename = null;
+        int returnVal = fileChooser.showSaveDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            downloadedFilename = fileChooser.getSelectedFile().getAbsolutePath();
+            System.out.println("Save file in: " + downloadedFilename + "\n");
+            } else {
+                System.out.println("File access cancelled by user.");
+            }
+        return downloadedFilename;
+    }
+    
+    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+        String downloadFrom = "/a.txt";
+        String downloadTo = null;
+        try {
+            textArea.append("Preparing to download a file to decrypt.");
+            downloadTo = downloadFileLocation();            
+            System.out.println("Download file save in: "+downloadTo);
+            /* download file named downloadFrom*/
+            try (FileOutputStream outputStream = new FileOutputStream(downloadTo)) {
+                DbxEntry.File downloadedFile = authenticate().getFile(downloadFrom, null,
+                    outputStream);
+                System.out.println("Metadata: " + downloadedFile.toString());
+            }
+            
+            /* decrypt the file*/
+            decryptFile(downloadTo);
+        } catch (IOException | DbxException | InterruptedException ex) {
+            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_downloadButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -239,9 +308,18 @@ public class DropboxAPI extends javax.swing.JFrame {
     private javax.swing.JMenu File;
     private javax.swing.JMenuItem Open;
     private javax.swing.JButton Upload;
+    private javax.swing.JButton downloadButton;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea textArea;
     // End of variables declaration//GEN-END:variables
+
+    private void decryptFile(String filename) {
+        ExecuteCLT com = new ExecuteCLT();
+        System.out.println("Decrypting" + filename + "...");
+        System.out.println(com.decryptCommand("priv-key",filename));
+        System.out.println("File decryption complete. \n"
+            + "You can now view the file in "+filename);
+    }
 }
