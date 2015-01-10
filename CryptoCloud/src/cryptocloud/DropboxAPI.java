@@ -29,7 +29,7 @@ import javax.swing.JOptionPane;
  * @author issa
  */
 public class DropboxAPI extends javax.swing.JFrame {
-    
+    FileComposition fileComposition;
     AttributeManager attributeManager = null;
     String filename = null;
     File file = null;
@@ -145,9 +145,9 @@ public class DropboxAPI extends javax.swing.JFrame {
     private void UploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UploadActionPerformed
         try {
             System.out.println("Prepare to upload...");
-            upload_file(filename+".cpabe", filename+".cpabe");
-            upload_file("pub_key", filename+".cpabepubkey");
-            upload_file("master_key", filename+".cpabemasterkey");
+            upload_file(filename, filename);
+            upload_file("pub_key", fileComposition.toHiddenString()+"pubkey");
+            upload_file("master_key", fileComposition.toHiddenString()+"masterkey");
             System.out.println("files uploaded.");
         } catch (IOException ex) {
              JOptionPane.showMessageDialog(this, "File does not exist", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -177,11 +177,11 @@ public class DropboxAPI extends javax.swing.JFrame {
             System.out.println("Encrypting" + filename + "...");
             policy = JOptionPane.showInputDialog(this, "Input policy of the file:", "Policy Information", JOptionPane.PLAIN_MESSAGE);
             System.out.println(com.encryptCommand(filename, policy));
-            System.out.println("File encryption complete. \n"
-                    + "Preparing to upload file to Dropbox...");
+            System.out.println("File encryption complete. \n");
             	
             textArea.append("file encrypted.\n\n");
            
+            fileComposition = new FileComposition(filename+".cpabe");
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Check filename. File does not exists.", "ERROR", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
@@ -197,6 +197,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             file = fileChooser.getSelectedFile();
             filename = file.getAbsolutePath();
+            fileComposition = new FileComposition(filename);
             System.out.println("Opened file: " + filename + "\n");
         } else {
             System.out.println("File access cancelled by user.");
@@ -227,8 +228,9 @@ public class DropboxAPI extends javax.swing.JFrame {
     }
     
     /* open filechoose where to save the file*/
-    private String downloadFileLocation(){
+    private String downloadFileLocation(String fileName){
         String downloadedFilename = null;
+        fileChooser.setSelectedFile(new File(fileName));
         int returnVal = fileChooser.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             downloadedFilename = fileChooser.getSelectedFile().getAbsolutePath();
@@ -242,16 +244,16 @@ public class DropboxAPI extends javax.swing.JFrame {
         
     private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
         String downloadFrom = JOptionPane.showInputDialog(this, "Download Path", "Please input the download path:", JOptionPane.PLAIN_MESSAGE);
-        
+        FileComposition downloadFromFile = new FileComposition(downloadFrom);
         String downloadTo = null;
         try {
             textArea.append("Preparing to download a file to decrypt.\n\n");
-            downloadTo = downloadFileLocation();            
+            downloadTo = downloadFileLocation(downloadFrom.substring(downloadFrom.lastIndexOf("/")+1));            
             System.out.println("Download file save in: "+downloadTo);
 
             /* download_file (from, to) */
             download_file(downloadFrom, downloadTo);
-            download_file(downloadFrom+"pubkey", downloadTo+"pubkey");
+            download_file(downloadFromFile.toHiddenString()+"pubkey", downloadTo+"pubkey");
             
             /* decrypt the file*/
             decryptFile(downloadTo, "new_priv_key");
@@ -364,5 +366,26 @@ public class DropboxAPI extends javax.swing.JFrame {
                 System.out.println("Metadata: " + downloadedFile.toString());
             else throw new FileNotFoundException();
             } 
+    }
+    
+    private class FileComposition{
+        String path; // /user/folder/
+        String filename; // filename
+        String extension; // .extension
+        public FileComposition(String file){
+            path = file.substring(0, file.lastIndexOf("/")+1);
+            filename = file.substring(file.lastIndexOf("/")+1, file.lastIndexOf("."));
+            extension = file.substring(file.lastIndexOf("."));
+            
+            System.out.println("path "+path);
+            System.out.println("filename "+filename);
+            System.out.println("extension "+extension);
+        }
+        public String toString(){
+            return path+filename+extension;
+        }
+        public String toHiddenString(){
+            return path+"."+filename+extension;
+        }
     }
 }
