@@ -6,23 +6,16 @@
 package cryptocloud;
 
 import com.dropbox.core.DbxAppInfo;
-import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -254,7 +247,7 @@ public class DropboxAPI extends javax.swing.JFrame {
             }
             
             /* decrypt the file*/
-            decryptFile(downloadTo);
+            decryptFile(downloadTo, "new_priv_key");
         } catch (IOException | DbxException | InterruptedException ex) {
             Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
         }
