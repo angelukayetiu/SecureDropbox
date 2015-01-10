@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 
 /**
@@ -163,8 +164,8 @@ public class DropboxAPI extends javax.swing.JFrame {
             //String accessToken = authFinish.accessToken;
 */           
             upload_file(filename+".cpabe", filename+".cpabe");
-            upload_file("pub_key", filename+".pubkey");
-            upload_file("master_key", filename+".masterkey");
+            upload_file("pub_key", filename+".cpabepubkey");
+            upload_file("master_key", filename+".cpabemasterkey");
             //System.out.println(com.decryptCommand("new_priv_key", filename + ".cpabe"));
             
             
@@ -225,8 +226,10 @@ public class DropboxAPI extends javax.swing.JFrame {
         return downloadedFilename;
     }
     
+        
     private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
-        String downloadFrom = "/a_down.cpabe";
+        String downloadFrom = JOptionPane.showInputDialog(this, "Download Path", "Please input the download path:", JOptionPane.PLAIN_MESSAGE);
+        
         String downloadTo = null;
         try {
             textArea.append("Preparing to download a file to decrypt.\n\n");
@@ -235,6 +238,7 @@ public class DropboxAPI extends javax.swing.JFrame {
 
             /* download_file (from, to) */
             download_file(downloadFrom, downloadTo);
+            download_file(downloadFrom+"pubkey", downloadTo+"pubkey");
             
             /* decrypt the file*/
             decryptFile(downloadTo, "new_priv_key");
