@@ -14,6 +14,7 @@ import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
@@ -32,9 +33,10 @@ public class DropboxAPI extends javax.swing.JFrame {
     File file = null;
     private final String APP_KEY = "2gljsdvv0whija4";
     private final String APP_SECRET = "kuw1l5rhux1q2pp";
-    
+    private String accessToken; // TODO try make accessToken global to lessen authentication steps for upload and download
     public DropboxAPI() {
         initComponents();
+        accessToken = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -159,20 +161,10 @@ public class DropboxAPI extends javax.swing.JFrame {
             System.out.println("Code is" + code);
             DbxAuthFinish authFinish = webAuth.finish(code);
             //String accessToken = authFinish.accessToken;
-*/            String accessToken = "IS3HsK4J0YUAAAAAAAAM2q2eqeU2e4toyPAy6-U6YD08fhlaT9GWxQ8Y8jTIzzC3";
-            DbxClient client = new DbxClient(config, accessToken);
-            System.out.println("Linked account: " + client.getAccountInfo().displayName);
-            
-            File new_file = new File(filename + ".cpabe");
-            FileInputStream inputStream = new FileInputStream(new_file);
-            try {
-                DbxEntry.File uploadedFile = client.uploadFile(filename + ".cpabe",
-                    DbxWriteMode.add(),new_file.length(), inputStream);
-                System.out.println("Uploaded: " + uploadedFile.toString());
-            } finally {
-                inputStream.close();
-            }
-            
+*/           
+            upload_file(filename+".cpabe", filename+".cpabe");
+            upload_file("pub_key", filename+".pubkey");
+            upload_file("master_key", filename+".masterkey");
             //System.out.println(com.decryptCommand("new_priv_key", filename + ".cpabe"));
             
             
@@ -198,6 +190,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     }//GEN-LAST:event_OpenActionPerformed
     
     private DbxClient authenticate() throws DbxException, InterruptedException{
+        
         DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
         DbxRequestConfig config = new DbxRequestConfig(
                 "JavaTutorial/1.0", Locale.getDefault().toString());
@@ -233,18 +226,15 @@ public class DropboxAPI extends javax.swing.JFrame {
     }
     
     private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
-        String downloadFrom = "/a.txt";
+        String downloadFrom = "/a_down.cpabe";
         String downloadTo = null;
         try {
-            textArea.append("Preparing to download a file to decrypt.");
+            textArea.append("Preparing to download a file to decrypt.\n\n");
             downloadTo = downloadFileLocation();            
             System.out.println("Download file save in: "+downloadTo);
-            /* download file named downloadFrom*/
-            try (FileOutputStream outputStream = new FileOutputStream(downloadTo)) {
-                DbxEntry.File downloadedFile = authenticate().getFile(downloadFrom, null,
-                    outputStream);
-                System.out.println("Metadata: " + downloadedFile.toString());
-            }
+
+            /* download_file (from, to) */
+            download_file(downloadFrom, downloadTo);
             
             /* decrypt the file*/
             decryptFile(downloadTo, "new_priv_key");
@@ -314,5 +304,22 @@ public class DropboxAPI extends javax.swing.JFrame {
         System.out.println(com.decryptCommand(privkeyLocation,filename));
         System.out.println("File decryption complete. \n"
             + "You can now view the file in "+filename);
+    }
+
+    private void upload_file(String uploadFrom, String uploadTo) throws FileNotFoundException, DbxException, InterruptedException, IOException {
+        File uploadFile = new File(uploadFrom);
+        try (FileInputStream inputStream = new FileInputStream(uploadFile)) {
+            DbxEntry.File uploadedFile = authenticate().uploadFile(uploadTo,
+                    DbxWriteMode.add(),uploadFile.length(), inputStream);
+                System.out.println("Uploaded: " + uploadedFile.toString());
+            }
+    }
+
+    private void download_file(String downloadFrom, String downloadTo) throws FileNotFoundException, DbxException, InterruptedException, IOException {
+        try (FileOutputStream outputStream = new FileOutputStream(downloadTo)) {
+                DbxEntry.File downloadedFile = authenticate().getFile(downloadFrom, null,
+                    outputStream);
+                System.out.println("Metadata: " + downloadedFile.toString());
+            }
     }
 }
