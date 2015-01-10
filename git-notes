@@ -1,0 +1,36 @@
+go to project folder
+
+Local
+
+git init / git clone
+
+git status
+
+git add *.java
+
+git commit -m 'initial commit'
+
+git reset
+
+git branch <branchname>
+
+git checkout
+
+git merge master <branchname>
+
+git rebase <srcOfCommits> <destination>
+
+git revert
+
+gitk / git gui &
+
+git remote <url>
+
+git push origin master
+
+git pull
+
+
+
+
+
