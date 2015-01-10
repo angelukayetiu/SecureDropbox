@@ -143,7 +143,23 @@ public class DropboxAPI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void UploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UploadActionPerformed
-       
+        try {
+            System.out.println("Prepare to upload...");
+            upload_file(filename+".cpabe", filename+".cpabe");
+            upload_file("pub_key", filename+".cpabepubkey");
+            upload_file("master_key", filename+".cpabemasterkey");
+            System.out.println("files uploaded.");
+        } catch (IOException ex) {
+             JOptionPane.showMessageDialog(this, "File does not exist", "ERROR", JOptionPane.ERROR_MESSAGE);
+           Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (DbxException ex) {
+            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }//GEN-LAST:event_UploadActionPerformed
 
     private void EncryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EncryptActionPerformed
@@ -151,7 +167,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         String[] attributes = {"comsci_student", "Cavite"};
         
         try {
-            textArea.append("Preparing to encrypt file.");
+            textArea.append("Preparing to encrypt file...");
                                    
             ExecuteCLT com = new ExecuteCLT();
             System.out.println("Setting up master key and public key..." + "\n");
@@ -164,34 +180,15 @@ public class DropboxAPI extends javax.swing.JFrame {
             System.out.println("File encryption complete. \n"
                     + "Preparing to upload file to Dropbox...");
             	
-            DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
-            DbxRequestConfig config = new DbxRequestConfig(
-                "JavaTutorial/1.0", Locale.getDefault().toString());
-            DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
-                        
-/*            String authorizeUrl = webAuth.start();
-            System.out.println("1. Go to: " + authorizeUrl);
-            System.out.println("2. Click \"Allow\" (you might have to log in first)");
-            System.out.println("3. Copy the authorization code.");
-            String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
-            
-            System.out.println("Code is" + code);
-            DbxAuthFinish authFinish = webAuth.finish(code);
-            //String accessToken = authFinish.accessToken;
-*/           
-            upload_file(filename+".cpabe", filename+".cpabe");
-            upload_file("pub_key", filename+".cpabepubkey");
-            upload_file("master_key", filename+".cpabemasterkey");
-            //System.out.println(com.decryptCommand("new_priv_key", filename + ".cpabe"));
-            
-            
+            textArea.append("file encrypted.\n\n");
+           
         } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Check filename. File does not exists.", "ERROR", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
+            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DbxException ex) {
-            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         
     }//GEN-LAST:event_EncryptActionPerformed
 
@@ -258,8 +255,27 @@ public class DropboxAPI extends javax.swing.JFrame {
             
             /* decrypt the file*/
             decryptFile(downloadTo, "new_priv_key");
-        } catch (IOException | DbxException | InterruptedException ex) {
-            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex){
+            JOptionPane.showMessageDialog(this, "Check download pathname", "Invalid FileName", JOptionPane.ERROR_MESSAGE);
+            try{
+                (new File(downloadTo)).delete();
+            } catch(Exception ex1){
+                System.err.println(downloadTo+ " DNE");
+            }
+        } catch( DbxException | InterruptedException ex3) {
+            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex3);
+            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
+            try{
+                (new File(downloadTo)).delete();
+            } catch(Exception ex1){
+                System.err.println(downloadTo+ " DNE");
+            }
+        } finally {
+            try{
+                (new File(downloadTo+"pubkey")).delete();
+            } catch(Exception ex2){
+                System.err.println(downloadTo+"pubkey DNE");
+            }
         }
 
     }//GEN-LAST:event_downloadButtonActionPerformed
@@ -344,7 +360,9 @@ public class DropboxAPI extends javax.swing.JFrame {
         try (FileOutputStream outputStream = new FileOutputStream(downloadTo)) {
                 DbxEntry.File downloadedFile = authenticate().getFile(downloadFrom, null,
                     outputStream);
+            if(downloadedFile !=null)
                 System.out.println("Metadata: " + downloadedFile.toString());
-            }
+            else throw new FileNotFoundException();
+            } 
     }
 }
