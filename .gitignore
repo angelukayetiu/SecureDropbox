@@ -9,7 +9,6 @@ CryptoCloud/nbproject/*
 /CryptoCloud/dist/
 CryptoCloud/build
 .DS_store
-*priv_key*
 CryptoCloud/priv_key
 CryptoCloud/priv_key_TC
 CryptoCloud/teacher_priv_key
