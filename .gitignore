@@ -9,3 +9,4 @@ CryptoCloud/nbproject/*
 /CryptoCloud/dist/
 CryptoCloud/build
 .DS_store
+*priv_key*
