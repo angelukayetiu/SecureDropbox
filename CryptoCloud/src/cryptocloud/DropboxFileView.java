@@ -162,15 +162,17 @@ public class DropboxFileView extends JPanel
         System.out.println("Files in the path: " +folder.path);
         for (DbxEntry child : listing.children) {
             System.out.println("	" + child.name);
-            if(child.isFile()){
-                FileInfo file = new FileInfo(child);
-                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(file);
-                top.add(fileNode);
-            } else{
-                FileInfo subFolder = new FileInfo(child);
-                DefaultMutableTreeNode subFolderNode = new DefaultMutableTreeNode(subFolder);
-                top.add(subFolderNode);
-                createNodes(subFolderNode);
+            if (!child.name.startsWith(".")){
+                if(child.isFile()){
+                    FileInfo file = new FileInfo(child);
+                    DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(file);
+                    top.add(fileNode);
+                } else{
+                    FileInfo subFolder = new FileInfo(child);
+                    DefaultMutableTreeNode subFolderNode = new DefaultMutableTreeNode(subFolder);
+                    top.add(subFolderNode);
+                    createNodes(subFolderNode);
+               }            
            }
         }
     }
