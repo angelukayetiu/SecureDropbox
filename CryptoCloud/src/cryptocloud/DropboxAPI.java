@@ -286,7 +286,8 @@ public class DropboxAPI extends javax.swing.JFrame {
 
                 /* download_file (from, to) */
                 download_file(downloadFrom, downloadTo);
-                download_file(downloadFromFile.toHiddenString()+"pubkey", downloadTo+"pubkey");
+                if(downloadFromFile.extension.contains("cpabe"))
+                    download_file(downloadFromFile.toHiddenString()+"pubkey", downloadTo+"pubkey");
 
                 /* decrypt the file*/
                 decryptFile(downloadTo, "new_priv_key");
@@ -307,7 +308,8 @@ public class DropboxAPI extends javax.swing.JFrame {
                 }
             } finally {
                 try{
-                    (new File(downloadTo+"pubkey")).delete();
+                    if (downloadFromFile.extension.contains("cpabe"))
+                        (new File(downloadTo+"pubkey")).delete();
                 } catch(Exception ex2){
                     System.err.println(downloadTo+"pubkey DNE");
                 }
