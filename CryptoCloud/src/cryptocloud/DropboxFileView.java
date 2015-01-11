@@ -151,6 +151,7 @@ public class DropboxFileView extends JPanel
             try {
                 UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
+                
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
                 System.err.println("Couldn't use system look and feel.");
             }

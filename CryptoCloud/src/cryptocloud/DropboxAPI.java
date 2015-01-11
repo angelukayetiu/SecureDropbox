@@ -176,7 +176,8 @@ public class DropboxAPI extends javax.swing.JFrame {
     private void UploadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UploadActionPerformed
         try {
             System.out.println("Prepare to upload...");
-            upload_file(filename, filename);
+            System.out.println(filename);
+            upload_file(fileComposition.toString(), fileComposition.toString());
             upload_file("pub_key", fileComposition.toHiddenString()+"pubkey");
             upload_file("master_key", fileComposition.toHiddenString()+"masterkey");
             System.out.println("files uploaded.");
@@ -394,7 +395,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         ExecuteCLT com = new ExecuteCLT();
         System.out.println("Decrypting" + filename + "...");
         System.out.println(com.decryptCommand(privkeyLocation,filename));
-        fileComposition.change(filename);
+        fileComposition = new FileComposition(filename);
         System.out.println("File decryption complete. \n"
             + "You can now view the file in "+ fileComposition.toString());
     }
