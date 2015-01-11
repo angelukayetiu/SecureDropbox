@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -312,11 +314,29 @@ public class DropboxAPI extends javax.swing.JFrame {
 
                 /* download_file (from, to) */
                 download_file(downloadFrom, downloadTo);
-                if(downloadFromFile.extension.contains("cpabe"))
+                if(downloadFromFile.extension.contains("cpabe")){
+                    
                     download_file(downloadFromFile.toHiddenString()+"pubkey", downloadTo+"pubkey");
 
-                /* decrypt the file*/
-                decryptFile(downloadTo, "new_priv_key");
+                    boolean decrypted = false;
+                    /* decrypt the file*/
+                    System.out.println("Files in the folder:");
+                    //Get all private key in folder
+                    List<String> result = new ArrayList<>();
+                    File[] files = new File(downloadTo.substring(0, downloadTo.lastIndexOf("/"))).listFiles();
+                    System.out.println("Files in the folder:"+files.toString());
+                    for (File subFile : files) {
+                        if (subFile.isFile() && subFile.getName().endsWith(".cpabeprivkey")) {
+                            if (decryptFile(downloadTo, subFile.getAbsolutePath())){
+                                decrypted = true; break;
+                            }
+                        }
+                    }
+                    if (decrypted)
+                        JOptionPane.showMessageDialog(this, "File decrypted.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    else
+                        JOptionPane.showMessageDialog(this, "File decryption unsuccessful.", "Error", JOptionPane.ERROR_MESSAGE);                        
+                }
             } catch (IOException ex){
                 JOptionPane.showMessageDialog(this, "Check download pathname", "Invalid FileName", JOptionPane.ERROR_MESSAGE);
                 try{
@@ -422,13 +442,13 @@ public class DropboxAPI extends javax.swing.JFrame {
     private javax.swing.JTextArea textArea;
     // End of variables declaration//GEN-END:variables
 
-    private void decryptFile(String filename, String privkeyLocation) {
+    private boolean decryptFile(String filename, String privkeyLocation) {
+        boolean success;
         ExecuteCLT com = new ExecuteCLT();
-        System.out.println("Decrypting" + filename + "...");
-        System.out.println(com.decryptCommand(privkeyLocation,filename));
+        System.out.println("Decrypting" + filename + "...with "+privkeyLocation );                
+        success = com.decryptCommand(privkeyLocation,filename);        
         fileComposition = new FileComposition(filename);
-        System.out.println("File decryption complete. \n"
-            + "You can now view the file in "+ fileComposition.toString());
+        return success;
     }
 
     private void upload_file(String uploadFrom, String uploadTo) throws FileNotFoundException, DbxException, InterruptedException, IOException {

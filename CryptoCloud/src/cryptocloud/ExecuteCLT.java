@@ -130,10 +130,12 @@ public class ExecuteCLT {
         return output.toString();
     }
     
-    public String decryptCommand(String priv_key, String enc_file){
+    public boolean decryptCommand(String priv_key, String enc_file){
+        boolean isSuccess = false;
         StringBuffer output = new StringBuffer();
         ProcessBuilder pb = new ProcessBuilder(abeLocation + "cpabe-dec", enc_file+"pubkey", priv_key, enc_file);
-                
+        System.out.println("From decrypt command");
+        System.out.println(abeLocation + "cpabe-dec"+" pubkey "+enc_file+"pubkey"+" private key "+ priv_key+" encryptedfile"+ enc_file);
         try{
         Process p = pb.start(); 
         
@@ -153,11 +155,13 @@ public class ExecuteCLT {
         
         //returns status code of commad; 0 if successful
         int status_code = p.waitFor();
+        isSuccess = status_code ==0;
         System.out.println("cpabe-dec exited with status " + status_code);
         
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return output.toString();
+        System.out.println("end decrypt command");
+        return isSuccess;
     } 
 }
