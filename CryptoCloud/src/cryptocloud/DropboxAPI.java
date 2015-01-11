@@ -12,6 +12,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
+import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +23,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
 
 
 /**
@@ -30,9 +35,10 @@ import javax.swing.JOptionPane;
  */
 public class DropboxAPI extends javax.swing.JFrame {
     FileComposition fileComposition;
-    AttributeManager attributeManager = null;
+    AttributeManager attributeManager;
     String filename = null;
     File file = null;
+    JTree dropboxFileList;
     private final String APP_KEY = "2gljsdvv0whija4";
     private final String APP_SECRET = "kuw1l5rhux1q2pp";
     private String accessToken; // TODO try make accessToken global to lessen authentication steps for upload and download
@@ -41,8 +47,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         accessToken = null;
         attributeManager = new AttributeManager();
         attributeManager.setVisible(false);
-        
-        
+        constructFileTree();
         System.out.println(System.getProperty("user.dir"));
     }
 
@@ -56,10 +61,17 @@ public class DropboxAPI extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
         downloadButton = new javax.swing.JButton();
+        folderTreeView = new javax.swing.JPanel();
+        try {
+            dropboxFileView1 = new cryptocloud.DropboxFileView();
+        } catch (com.dropbox.core.DbxException e1) {
+            e1.printStackTrace();
+        } catch (java.lang.InterruptedException e2) {
+            e2.printStackTrace();
+        }
         jMenuBar1 = new javax.swing.JMenuBar();
         File = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
-        Attributes = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -88,8 +100,26 @@ public class DropboxAPI extends javax.swing.JFrame {
             }
         });
 
+        folderTreeView.addContainerListener(new java.awt.event.ContainerAdapter() {
+            public void componentAdded(java.awt.event.ContainerEvent evt) {
+                folderTreeViewComponentAdded(evt);
+            }
+        });
+
+        javax.swing.GroupLayout folderTreeViewLayout = new javax.swing.GroupLayout(folderTreeView);
+        folderTreeView.setLayout(folderTreeViewLayout);
+        folderTreeViewLayout.setHorizontalGroup(
+            folderTreeViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        folderTreeViewLayout.setVerticalGroup(
+            folderTreeViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         File.setText("File");
 
+        Open.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         Open.setText("Open");
         Open.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -97,14 +127,6 @@ public class DropboxAPI extends javax.swing.JFrame {
             }
         });
         File.add(Open);
-
-        Attributes.setText("Manage Attributes");
-        Attributes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                AttributesActionPerformed(evt);
-            }
-        });
-        File.add(Attributes);
 
         jMenuBar1.add(File);
 
@@ -115,10 +137,16 @@ public class DropboxAPI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(22, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(folderTreeView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(30, 30, 30)
+                        .addComponent(dropboxFileView1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(56, 56, 56)
                         .addComponent(downloadButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(Encrypt)
@@ -128,9 +156,12 @@ public class DropboxAPI extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(dropboxFileView1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                    .addComponent(folderTreeView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(Upload)
@@ -221,7 +252,7 @@ public class DropboxAPI extends javax.swing.JFrame {
             DbxAuthFinish authFinish = webAuth.finish(code);
             //String accessToken = authFinish.accessToken;
 */          
-        String accessToken = "IS3HsK4J0YUAAAAAAAAM2q2eqeU2e4toyPAy6-U6YD08fhlaT9GWxQ8Y8jTIzzC3";
+        String accessToken = "47WOsIRFKIsAAAAAAAAFy4KPfef95PDgRfABstggWX6ElA4dmOMV6KyAd1_qrMIW";
         DbxClient client = new DbxClient(config, accessToken);
         System.out.println("Linked account: " + client.getAccountInfo().displayName); 
         return client;
@@ -243,49 +274,64 @@ public class DropboxAPI extends javax.swing.JFrame {
     
         
     private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
-        String downloadFrom = JOptionPane.showInputDialog(this, "Download Path", "Please input the download path:", JOptionPane.PLAIN_MESSAGE);
-        FileComposition downloadFromFile = new FileComposition(downloadFrom);
-        String downloadTo = null;
-        try {
-            textArea.append("Preparing to download a file to decrypt.\n\n");
-            downloadTo = downloadFileLocation(downloadFrom.substring(downloadFrom.lastIndexOf("/")+1));            
-            System.out.println("Download file save in: "+downloadTo);
+        
+        String downloadFrom = getDropboxFilePath();
+        if (downloadFrom!=null){
+            FileComposition downloadFromFile = new FileComposition(downloadFrom);
+            String downloadTo = null;
+            try {
+                textArea.append("Preparing to download a file to decrypt.\n\n");
+                downloadTo = downloadFileLocation(downloadFrom.substring(downloadFrom.lastIndexOf("/")+1));            
+                System.out.println("Download file save in: "+downloadTo);
 
-            /* download_file (from, to) */
-            download_file(downloadFrom, downloadTo);
-            download_file(downloadFromFile.toHiddenString()+"pubkey", downloadTo+"pubkey");
-            
-            /* decrypt the file*/
-            decryptFile(downloadTo, "new_priv_key");
-        } catch (IOException ex){
-            JOptionPane.showMessageDialog(this, "Check download pathname", "Invalid FileName", JOptionPane.ERROR_MESSAGE);
-            try{
-                (new File(downloadTo)).delete();
-            } catch(Exception ex1){
-                System.err.println(downloadTo+ " DNE");
-            }
-        } catch( DbxException | InterruptedException ex3) {
-            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex3);
-            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
-            try{
-                (new File(downloadTo)).delete();
-            } catch(Exception ex1){
-                System.err.println(downloadTo+ " DNE");
-            }
-        } finally {
-            try{
-                (new File(downloadTo+"pubkey")).delete();
-            } catch(Exception ex2){
-                System.err.println(downloadTo+"pubkey DNE");
+                /* download_file (from, to) */
+                download_file(downloadFrom, downloadTo);
+                download_file(downloadFromFile.toHiddenString()+"pubkey", downloadTo+"pubkey");
+
+                /* decrypt the file*/
+                decryptFile(downloadTo, "new_priv_key");
+            } catch (IOException ex){
+                JOptionPane.showMessageDialog(this, "Check download pathname", "Invalid FileName", JOptionPane.ERROR_MESSAGE);
+                try{
+                    (new File(downloadTo)).delete();
+                } catch(Exception ex1){
+                    System.err.println(downloadTo+ " DNE");
+                }
+            } catch( DbxException | InterruptedException ex3) {
+                Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex3);
+                JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
+                try{
+                    (new File(downloadTo)).delete();
+                } catch(Exception ex1){
+                    System.err.println(downloadTo+ " DNE");
+                }
+            } finally {
+                try{
+                    (new File(downloadTo+"pubkey")).delete();
+                } catch(Exception ex2){
+                    System.err.println(downloadTo+"pubkey DNE");
+                }
             }
         }
-
     }//GEN-LAST:event_downloadButtonActionPerformed
 
-    private void AttributesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AttributesActionPerformed
-        attributeManager.setVisible(true);
-    }//GEN-LAST:event_AttributesActionPerformed
-
+    private void folderTreeViewComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_folderTreeViewComponentAdded
+    }//GEN-LAST:event_folderTreeViewComponentAdded
+    
+    private void constructFileTree(){
+/*        try{
+            JPanel jpanelTree = new DropboxFileView(authenticate());
+            folderTreeView.add(jpanelTree);
+            
+//            jTree1.setModel(listing);
+            
+        } catch (InterruptedException|DbxException ex) {
+            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } 
+*/
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -329,13 +375,14 @@ public class DropboxAPI extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu Attributes;
     private javax.swing.JButton Encrypt;
     private javax.swing.JMenu File;
     private javax.swing.JMenuItem Open;
     private javax.swing.JButton Upload;
     private javax.swing.JButton downloadButton;
+    private cryptocloud.DropboxFileView dropboxFileView1;
     private javax.swing.JFileChooser fileChooser;
+    private javax.swing.JPanel folderTreeView;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea textArea;
@@ -367,6 +414,14 @@ public class DropboxAPI extends javax.swing.JFrame {
                 System.out.println("Metadata: " + downloadedFile.toString());
             else throw new FileNotFoundException();
             } 
+    }
+
+    private String getDropboxFilePath() {
+        DbxEntry entry = dropboxFileView1.getValue();
+        if (entry!=null && entry.isFile())
+            return entry.path;
+        JOptionPane.showMessageDialog(this, "Please select a file to download", "ERROR", JOptionPane.ERROR_MESSAGE);
+        return null;
     }
     
     private class FileComposition{
