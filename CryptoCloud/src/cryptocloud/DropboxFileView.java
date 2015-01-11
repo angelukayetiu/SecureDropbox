@@ -75,7 +75,7 @@ public class DropboxFileView extends JPanel
         tree = new JTree(top);
         tree.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
-
+        tree.setEditable(true);
         //Listen for when the selection changes.
         tree.addTreeSelectionListener(this);
 
@@ -83,7 +83,36 @@ public class DropboxFileView extends JPanel
         JScrollPane treeView = new JScrollPane(tree);
         add(treeView);
     }
-
+    
+    public void refreshFolders() throws DbxException{
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+                           tree.getModel().getRoot();
+        
+    }
+    
+    public void checkChildren(DefaultMutableTreeNode top)throws DbxException {
+ /*       Object nodeInfo = top.getUserObject();
+        FileInfo folder = (FileInfo)nodeInfo;
+        System.out.println(folder.toString());
+        
+        DbxEntry.WithChildren listing = client.getMetadataWithChildren(folder.path);
+        System.out.println("Files in the path: " +folder.path);
+        for (DbxEntry child : listing.children) {
+            System.out.println("	" + child.name);
+            if(child.isFile()){
+                FileInfo file = new FileInfo(child);
+                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(file);
+                top.add(fileNode);
+            } else{
+                FileInfo subFolder = new FileInfo(child);
+                DefaultMutableTreeNode subFolderNode = new DefaultMutableTreeNode(subFolder);
+                top.add(subFolderNode);
+                createNodes(subFolderNode);
+           }
+        }*/
+        //TODO refresh file list configuration
+    }
+        
     /** Required by TreeSelectionListener interface. */
     @Override
     public void valueChanged(TreeSelectionEvent e) {
