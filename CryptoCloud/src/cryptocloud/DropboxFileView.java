@@ -27,6 +27,10 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeSelectionModel;
 
 public class DropboxFileView extends JPanel
                       implements TreeSelectionListener {
@@ -60,7 +64,8 @@ public class DropboxFileView extends JPanel
     //Optionally set the look and feel.
     private static boolean useSystemLookAndFeel = false;
     private FileInfo recentValue;
-    
+    private DefaultTreeModel modelTree;
+
     public DropboxFileView() throws DbxException, InterruptedException {
         super(new GridLayout(1,0));
         DbxClient client1 = authenticate();
@@ -70,9 +75,11 @@ public class DropboxFileView extends JPanel
         DefaultMutableTreeNode top =
             new DefaultMutableTreeNode(new FileInfo(client1.getAccountInfo().displayName, "/"));
         createNodes(top);
-        recentValue = null;
+        modelTree = new DefaultTreeModel(top);
+        modelTree.addTreeModelListener(new RefreshFolderListener());        
+        
         //Create a tree that allows one selection at a time.
-        tree = new JTree(top);
+        tree = new JTree(modelTree);
         tree.getSelectionModel().setSelectionMode
                 (TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setEditable(true);
@@ -85,32 +92,15 @@ public class DropboxFileView extends JPanel
     }
     
     public void refreshFolders() throws DbxException{
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                           tree.getModel().getRoot();
-        
+        DefaultMutableTreeNode top =
+            new DefaultMutableTreeNode(new FileInfo(client.getAccountInfo().displayName, "/"));
+        createNodes(top);
+        modelTree = new DefaultTreeModel(top);
+        modelTree.addTreeModelListener(new RefreshFolderListener());        
+        tree.setModel(modelTree);
     }
     
     public void checkChildren(DefaultMutableTreeNode top)throws DbxException {
- /*       Object nodeInfo = top.getUserObject();
-        FileInfo folder = (FileInfo)nodeInfo;
-        System.out.println(folder.toString());
-        
-        DbxEntry.WithChildren listing = client.getMetadataWithChildren(folder.path);
-        System.out.println("Files in the path: " +folder.path);
-        for (DbxEntry child : listing.children) {
-            System.out.println("	" + child.name);
-            if(child.isFile()){
-                FileInfo file = new FileInfo(child);
-                DefaultMutableTreeNode fileNode = new DefaultMutableTreeNode(file);
-                top.add(fileNode);
-            } else{
-                FileInfo subFolder = new FileInfo(child);
-                DefaultMutableTreeNode subFolderNode = new DefaultMutableTreeNode(subFolder);
-                top.add(subFolderNode);
-                createNodes(subFolderNode);
-           }
-        }*/
-        //TODO refresh file list configuration
     }
         
     /** Required by TreeSelectionListener interface. */
@@ -130,7 +120,24 @@ public class DropboxFileView extends JPanel
     public DbxEntry getValue(){
         return recentValue==null? null:recentValue.child;
     }
-    
+
+    private static class RefreshFolderListener implements TreeModelListener {
+        @Override
+        public void treeNodesChanged(TreeModelEvent e) {    }
+        
+        @Override
+        public void treeNodesInserted(TreeModelEvent e) {
+        }
+        
+        @Override
+        public void treeNodesRemoved(TreeModelEvent e) {
+        }
+        
+        @Override
+        public void treeStructureChanged(TreeModelEvent e) {
+        }
+
+    }    
     private class FileInfo {
         public DbxEntry child;
         String name, path;
@@ -157,7 +164,7 @@ public class DropboxFileView extends JPanel
         Object nodeInfo = top.getUserObject();
         FileInfo folder = (FileInfo)nodeInfo;
         System.out.println(folder.toString());
-        
+
         DbxEntry.WithChildren listing = client.getMetadataWithChildren(folder.path);
         System.out.println("Files in the path: " +folder.path);
         for (DbxEntry child : listing.children) {
