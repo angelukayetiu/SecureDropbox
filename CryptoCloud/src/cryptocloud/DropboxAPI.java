@@ -6,17 +6,24 @@
 package cryptocloud;
 
 import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
+import com.dropbox.core.http.HttpRequestor;
+import com.dropbox.core.http.StandardHttpRequestor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +45,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     String filename = null;
     File file = null;
     JTree dropboxFileList;
+    boolean hasProxy = false;
     private final String APP_KEY = "2gljsdvv0whija4";
     private final String APP_SECRET = "kuw1l5rhux1q2pp";
     private String accessToken; // TODO try make accessToken global to lessen authentication steps for upload and download
@@ -275,26 +283,56 @@ public class DropboxAPI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_OpenActionPerformed
     
-    private DbxClient authenticate() throws DbxException, InterruptedException{
-        
-        DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
-        DbxRequestConfig config = new DbxRequestConfig(
-                "JavaTutorial/1.0", Locale.getDefault().toString());
-        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
+    public HttpRequestor getProxy(){
+            String ip = "proxy7.upd.edu.ph";
+            int port = 8080;
 
-/*            String authorizeUrl = webAuth.start();
-            System.out.println("1. Go to: " + authorizeUrl);
-            System.out.println("2. Click \"Allow\" (you might have to log in first)");
-            System.out.println("3. Copy the authorization code.");
-            String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
-            
-            System.out.println("Code is" + code);
-            DbxAuthFinish authFinish = webAuth.finish(code);
-            //String accessToken = authFinish.accessToken;
-*/          
-        String accessToken = "47WOsIRFKIsAAAAAAAAFy4KPfef95PDgRfABstggWX6ElA4dmOMV6KyAd1_qrMIW";
-        DbxClient client = new DbxClient(config, accessToken);
-        System.out.println("Linked account: " + client.getAccountInfo().displayName); 
+            final String authUser = "aptiu1";
+            final String authPassword = "";
+
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(authUser, authPassword.toCharArray());
+                }
+            });
+
+            Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(ip,port));
+
+
+            HttpRequestor req = new StandardHttpRequestor(proxy);
+            return req;
+    }    
+    private DbxClient authenticate() throws DbxException, InterruptedException{
+            DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+            DbxRequestConfig config;
+            //check for proxy code
+            if(hasProxy){
+                HttpRequestor requ = getProxy();
+                config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString(),requ);
+            }else
+                config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString());
+        if (accessToken == null){            
+
+            //for authentication
+            DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);        
+            String authorizeUrl = webAuth.start();
+            String message = "1. Go to: " + authorizeUrl+"\n";
+            message += "2. Click \"Allow\" (you might have to log in first)\n";
+            message += "3. Copy the authorization code.\n";
+            System.out.println(message);
+            String code = JOptionPane.showInputDialog(this, message, "AcccessToken", JOptionPane.PLAIN_MESSAGE);
+            if (code.trim().isEmpty()){
+                JOptionPane.showMessageDialog(this, "Authentication Fails", "Error", JOptionPane.ERROR_MESSAGE);
+            } else{
+                System.out.println("Code is" + code);
+                DbxAuthFinish authFinish = webAuth.finish(code);
+                accessToken = authFinish.accessToken;
+            }
+//        String accessToken = "47WOsIRFKIsAAAAAAAAFy4KPfef95PDgRfABstggWX6ElA4dmOMV6KyAd1_qrMIW";
+        }
+            DbxClient client = new DbxClient(config, accessToken);
+            System.out.println("Linked account: " + client.getAccountInfo().displayName); 
         return client;
     }
     
