@@ -45,7 +45,7 @@ import javax.swing.tree.DefaultTreeSelectionModel;
 
 public class DropboxFileView extends JPanel
                       implements TreeSelectionListener {
-    boolean hasProxy = true;String password="vanilla@01K";
+    boolean hasProxy = false;String password="";
     public HttpRequestor getProxy(){
             String ip = "proxy7.upd.edu.ph";
             int port = 8080;

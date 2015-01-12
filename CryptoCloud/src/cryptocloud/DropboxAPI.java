@@ -45,7 +45,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     String filename = null;
     File file = null;
     JTree dropboxFileList;
-    boolean hasProxy = true; String password="vanilla@01K";
+    boolean hasProxy = false; String password="";
     private final String APP_KEY = "2gljsdvv0whija4";
     private final String APP_SECRET = "kuw1l5rhux1q2pp";
     private String accessToken; // TODO try make accessToken global to lessen authentication steps for upload and download
