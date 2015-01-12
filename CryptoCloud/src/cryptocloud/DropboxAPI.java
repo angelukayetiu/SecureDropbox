@@ -346,8 +346,11 @@ public class DropboxAPI extends javax.swing.JFrame {
                     }
                     if (decrypted)
                         JOptionPane.showMessageDialog(this, "File decrypted.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    else
+                    else{
                         JOptionPane.showMessageDialog(this, "File decryption unsuccessful.", "Error", JOptionPane.ERROR_MESSAGE);                        
+                       (new File(downloadTo)).delete();
+                        
+                    }
                 }
             } catch (IOException ex){
                 JOptionPane.showMessageDialog(this, "Check download pathname", "Invalid FileName", JOptionPane.ERROR_MESSAGE);
@@ -479,6 +482,7 @@ public class DropboxAPI extends javax.swing.JFrame {
             DbxEntry.File uploadedFile = authenticate().uploadFile(uploadTo,
                     DbxWriteMode.add(),uploadFile.length(), inputStream);
                 System.out.println("Uploaded: " + uploadedFile.toString());
+            dropboxFileView1.addNewFile(uploadTo);
             }
     }
 

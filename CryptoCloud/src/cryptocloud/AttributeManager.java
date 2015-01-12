@@ -151,8 +151,8 @@ public class AttributeManager extends javax.swing.JFrame {
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         List<String> attributesToSave = attributeList.getSelectedValuesList();
-        
-        if (attributesToSave.isEmpty())
+        System.out.println(attributesToSave.toString());
+        if (attributesToSave.isEmpty() )
             JOptionPane.showMessageDialog(this, "Select attributes to save", "Error", JOptionPane.ERROR_MESSAGE);                
         else {
             FileComposition saveFile = new FileComposition(downloadFileLocation());
