@@ -166,8 +166,8 @@ public class AttributeManager extends javax.swing.JFrame {
             try {
                 copyPubKeyFile(saveFile);
             } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "File error", "Error", JOptionPane.ERROR_MESSAGE);
                 Logger.getLogger(AttributeManager.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(this, "File does not exists", "Error", JOptionPane.ERROR_MESSAGE);
             }
             System.out.println("key generation complete. You can now see the private key at "+saveFile.toString());
         }

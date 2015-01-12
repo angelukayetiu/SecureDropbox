@@ -45,7 +45,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     String filename = null;
     File file = null;
     JTree dropboxFileList;
-    boolean hasProxy = false; String password;
+    boolean hasProxy = true; String password="vanilla@01K";
     private final String APP_KEY = "2gljsdvv0whija4";
     private final String APP_SECRET = "kuw1l5rhux1q2pp";
     private String accessToken; // TODO try make accessToken global to lessen authentication steps for upload and download
@@ -56,6 +56,7 @@ public class DropboxAPI extends javax.swing.JFrame {
         attributeManager.setVisible(false);
         constructFileTree();
         System.out.println(System.getProperty("user.dir"));
+        setupKeys();
     }
 
     @SuppressWarnings("unchecked")
@@ -241,33 +242,29 @@ public class DropboxAPI extends javax.swing.JFrame {
         
     }//GEN-LAST:event_UploadActionPerformed
 
-    private void EncryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EncryptActionPerformed
-        String policy = "student and comsci";
-        String[] attributes = {"comsci_student", "Cavite"};
-        
-        try {
-            textArea.append("Preparing to encrypt file...");
-                                   
+    private void setupKeys(){
             ExecuteCLT com = new ExecuteCLT();
             System.out.println("Setting up master key and public key..." + "\n");
+        try {
             System.out.println(com.executeCommand("cpabe-setup") + "\n");
-            System.out.println("Generating private key..." + "\n");
-            System.out.println(com.keygenCommand("new_priv_key", attributes));
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    private void EncryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EncryptActionPerformed
+        
+            textArea.append("Preparing to encrypt file...");
+            ExecuteCLT com = new ExecuteCLT();            
             System.out.println("Encrypting" + filename + "...");
-            policy = JOptionPane.showInputDialog(this, "Input policy of the file:", "Policy Information", JOptionPane.PLAIN_MESSAGE);
+            String policy = JOptionPane.showInputDialog(this, "Input policy of the file:", "Policy Information", JOptionPane.PLAIN_MESSAGE);
             System.out.println(com.encryptCommand(filename, policy));
             System.out.println("File encryption complete. \n");
             	
             textArea.append("file encrypted.\n\n");
            
             fileComposition = new FileComposition(filename+".cpabe");
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Check filename. File does not exists.", "ERROR", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            JOptionPane.showMessageDialog(this, "Check Internet Connection", "ERROR", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(DropboxAPI.class.getName()).log(Level.SEVERE, null, ex);
-        } 
         
     }//GEN-LAST:event_EncryptActionPerformed
 
