@@ -36,6 +36,7 @@ import java.net.Proxy;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -65,33 +66,44 @@ public class DropboxFileView extends JPanel
             HttpRequestor req = new StandardHttpRequestor(proxy);
             return req;
     }    
+    private String accessToken = null;
+    public String getAccessToken() throws DbxException, InterruptedException{
+        if (accessToken==null)
+            authenticate();
+        return accessToken;
+    }
     private DbxClient authenticate() throws DbxException, InterruptedException{
         
         DbxAppInfo appInfo = new DbxAppInfo("2gljsdvv0whija4", "kuw1l5rhux1q2pp");
         DbxRequestConfig config;
-        if(hasProxy){
-            HttpRequestor requ = getProxy();
-            config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString(),requ);
-        }
-        else
-            config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString());
-/*        
-        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
-        String authorizeUrl = webAuth.start();
+            //check for proxy code
+            if(hasProxy){
+                HttpRequestor requ = getProxy();
+                config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString(),requ);
+            }else
+                config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString());
+        if (accessToken == null){            
 
-        System.out.println("1. Go to: " + authorizeUrl);
-        System.out.println("2. Click \"Allow\" (you might have to log in first)");
-        System.out.println("3. Copy the authorization code.");
-        String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
-            
-            System.out.println("Code is" + code);
-            DbxAuthFinish authFinish = webAuth.finish(code);
-            //String accessToken = authFinish.accessToken;
-     */     
-        String accessToken = "47WOsIRFKIsAAAAAAAAFy4KPfef95PDgRfABstggWX6ElA4dmOMV6KyAd1_qrMIW";
-        DbxClient client1 = new DbxClient(config, accessToken);
-        System.out.println("Linked account: " + client1.getAccountInfo().displayName); 
-        return client1;
+            //for authentication
+            DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);        
+            String authorizeUrl = webAuth.start();
+            String message = "1. Go to: " + authorizeUrl+"\n";
+            message += "2. Click \"Allow\" (you might have to log in first)\n";
+            message += "3. Copy the authorization code.\n";
+            System.out.println(message);
+            String code = JOptionPane.showInputDialog(this, message, "AcccessToken", JOptionPane.PLAIN_MESSAGE);
+            if (code.trim().isEmpty()){
+                JOptionPane.showMessageDialog(this, "Authentication Fails", "Error", JOptionPane.ERROR_MESSAGE);
+            } else{
+                System.out.println("Code is" + code);
+                DbxAuthFinish authFinish = webAuth.finish(code);
+                accessToken = authFinish.accessToken;
+            }
+//        String accessToken = "47WOsIRFKIsAAAAAAAAFy4KPfef95PDgRfABstggWX6ElA4dmOMV6KyAd1_qrMIW";
+        }
+            client = new DbxClient(config, accessToken);
+            System.out.println("Linked account: " + client.getAccountInfo().displayName); 
+        return client;
     }
     private JTree tree;
     private static boolean DEBUG = false;

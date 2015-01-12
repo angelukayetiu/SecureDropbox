@@ -45,7 +45,7 @@ public class DropboxAPI extends javax.swing.JFrame {
     String filename = null;
     File file = null;
     JTree dropboxFileList;
-    boolean hasProxy = false;
+    boolean hasProxy = true;
     private final String APP_KEY = "2gljsdvv0whija4";
     private final String APP_SECRET = "kuw1l5rhux1q2pp";
     private String accessToken; // TODO try make accessToken global to lessen authentication steps for upload and download
@@ -288,7 +288,7 @@ public class DropboxAPI extends javax.swing.JFrame {
             int port = 8080;
 
             final String authUser = "aptiu1";
-            final String authPassword = "";
+            final String authPassword = "vanilla@01K";
 
             Authenticator.setDefault(new Authenticator() {
                 @Override
@@ -313,23 +313,7 @@ public class DropboxAPI extends javax.swing.JFrame {
             }else
                 config = new DbxRequestConfig("JavaTutorial/1.0", Locale.getDefault().toString());
         if (accessToken == null){            
-
-            //for authentication
-            DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);        
-            String authorizeUrl = webAuth.start();
-            String message = "1. Go to: " + authorizeUrl+"\n";
-            message += "2. Click \"Allow\" (you might have to log in first)\n";
-            message += "3. Copy the authorization code.\n";
-            System.out.println(message);
-            String code = JOptionPane.showInputDialog(this, message, "AcccessToken", JOptionPane.PLAIN_MESSAGE);
-            if (code.trim().isEmpty()){
-                JOptionPane.showMessageDialog(this, "Authentication Fails", "Error", JOptionPane.ERROR_MESSAGE);
-            } else{
-                System.out.println("Code is" + code);
-                DbxAuthFinish authFinish = webAuth.finish(code);
-                accessToken = authFinish.accessToken;
-            }
-//        String accessToken = "47WOsIRFKIsAAAAAAAAFy4KPfef95PDgRfABstggWX6ElA4dmOMV6KyAd1_qrMIW";
+            accessToken = dropboxFileView1.getAccessToken();
         }
             DbxClient client = new DbxClient(config, accessToken);
             System.out.println("Linked account: " + client.getAccountInfo().displayName); 
