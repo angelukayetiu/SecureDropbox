@@ -100,9 +100,7 @@ public class DropboxFileView extends JPanel
         tree.setModel(modelTree);
     }
     
-    public void checkChildren(DefaultMutableTreeNode top)throws DbxException {
-    }
-        
+    
     /** Required by TreeSelectionListener interface. */
     @Override
     public void valueChanged(TreeSelectionEvent e) {
@@ -119,6 +117,12 @@ public class DropboxFileView extends JPanel
 
     public DbxEntry getValue(){
         return recentValue==null? null:recentValue.child;
+    }
+
+    void addNewFile(String uploadTo) {
+/*        DefaultMutableTreeNode root = (DefaultMutableTreeNode) modelTree.getRoot();
+        
+        for (root.)*/
     }
 
     private static class RefreshFolderListener implements TreeModelListener {
